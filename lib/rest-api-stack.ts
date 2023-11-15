@@ -13,14 +13,19 @@ export class RestAPIStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Tables 
+    // ---------- TABLES ----------
+    /**
+     * Movies Table
+     */
     const moviesTable = new dynamodb.Table(this, "MoviesTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "Movies",
     });
-    //new movieCast table
+    /**
+     * Movie Cast Table
+     */
     const movieCastsTable = new dynamodb.Table(this, "MovieCastTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
@@ -33,8 +38,38 @@ export class RestAPIStack extends cdk.Stack {
         sortKey: { name: "roleName", type: dynamodb.AttributeType.STRING },
       });
 
-    
-    // Functions 
+    /**
+ * Movie Review Table
+ */
+const reviewsTable = new dynamodb.Table(this, "MovieReviewsTable", {
+  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+  partitionKey: { name: "movieId", type: dynamodb.AttributeType.STRING },
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  tableName: "MovieReviews",
+  stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES, // Optional: If you need to enable DynamoDB Streams
+  sortKey: { name: "movieId", type: dynamodb.AttributeType.STRING }, // Optional: If you want to query by movieId
+});
+
+// Add attribute definitions separately
+reviewsTable.attributeDefinitions.push({ attributeName: "movieId", attributeType: dynamodb.AttributeType.STRING });
+reviewsTable.attributeDefinitions.push({ attributeName: "reviewerName", attributeType: dynamodb.AttributeType.STRING });
+reviewsTable.attributeDefinitions.push({ attributeName: "rating", attributeType: dynamodb.AttributeType.NUMBER });
+reviewsTable.attributeDefinitions.push({ attributeName: "text", attributeType: dynamodb.AttributeType.STRING });
+
+reviewsTable.addGlobalSecondaryIndex({
+  indexName: "ReviewerNameIndex",
+  partitionKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
+});
+
+reviewsTable.addGlobalSecondaryIndex({
+  indexName: "RatingIndex",
+  partitionKey: { name: "rating", type: dynamodb.AttributeType.NUMBER },
+});
+
+    // ---------- LAMBDA FUNCTIONS ----------
+    /**
+     * Movie Lambda Functions
+     */ 
     const getMovieByIdFn = new lambdanode.NodejsFunction(
       this,
       "GetMovieByIdFn",
@@ -50,7 +85,7 @@ export class RestAPIStack extends cdk.Stack {
         },
       }
       );
-      
+
       const getAllMoviesFn = new lambdanode.NodejsFunction(
         this,
         "GetAllMoviesFn",
@@ -91,7 +126,9 @@ export class RestAPIStack extends cdk.Stack {
           },
         });  
         
-        // new function
+        /**
+         * Movie Cast Lambda Functions
+         */
         const getMovieCastMembersFn = new lambdanode.NodejsFunction(
           this,
           "GetCastMemberFn",
@@ -107,7 +144,47 @@ export class RestAPIStack extends cdk.Stack {
             },
           }
         );
+
+        /**
+         * Review Lambda Functions
+         */
+        const addReviewFn = new lambdanode.NodejsFunction(this, "AddReviewFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_16_X,
+          entry: `${__dirname}/../lambdas/addReview.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+            TABLE_NAME: reviewsTable.tableName,
+            REGION: "eu-west-1",
+          },
+        });
+
+        const getReviewsFn = new lambdanode.NodejsFunction(this, "GetReviewsFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_16_X,
+          entry: `${__dirname}/../lambdas/getReviews.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+          TABLE_NAME: reviewsTable.tableName,
+          REGION: 'eu-west-1',
+          },
+        });
+
+        const updateReviewFn = new lambdanode.NodejsFunction(this, "UpdateReviewFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_16_X,
+          entry: `${__dirname}/../lambdas/updateReview.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+          TABLE_NAME: reviewsTable.tableName,
+          REGION: "eu-west-1",
+          },
+        });
         
+        // ---------- DYNAMODB INIT ----------
         new custom.AwsCustomResource(this, "moviesddbInitData", {
           onCreate: {
             service: "DynamoDB",
@@ -125,14 +202,18 @@ export class RestAPIStack extends cdk.Stack {
           }),
         });
         
-        // Permissions 
+        // ---------- PERMISSIONS ----------
         moviesTable.grantReadWriteData(deleteMovieFn)
         moviesTable.grantReadData(getMovieByIdFn)
         moviesTable.grantReadData(getAllMoviesFn)
         moviesTable.grantReadWriteData(newMovieFn)
         movieCastsTable.grantReadData(getMovieCastMembersFn);
         movieCastsTable.grantReadData(getMovieByIdFn);
-        // REST API 
+        reviewsTable.grantReadWriteData(addReviewFn);
+        reviewsTable.grantReadData(getReviewsFn);
+        reviewsTable.grantReadWriteData(updateReviewFn);
+
+        // ---------- REST API ----------
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
       deployOptions: {
@@ -147,6 +228,7 @@ export class RestAPIStack extends cdk.Stack {
       },
     });
 
+    //
     const moviesEndpoint = api.root.addResource("movies");
     moviesEndpoint.addMethod(
       "GET",
@@ -174,6 +256,17 @@ export class RestAPIStack extends cdk.Stack {
       "DELETE",
       new apig.LambdaIntegration(deleteMovieFn, { proxy: true })
     );
+
+    /**
+     * Reviews API Endpoints
+     */
+    const reviewsEndpoint = movieEndpoint.addResource("reviews");
+    reviewsEndpoint.addMethod(
+      "POST", new apig.LambdaIntegration(addReviewFn, { proxy: true })
+      );
+    reviewsEndpoint.addMethod(
+      "GET", new apig.LambdaIntegration(getReviewsFn, { proxy: true })
+      );
         
       }
     }
