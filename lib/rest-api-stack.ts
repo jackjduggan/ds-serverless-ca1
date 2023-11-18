@@ -7,7 +7,7 @@ import * as apig from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { generateBatch } from "../shared/util";
-import { movies, movieCasts } from "../seed/movies"; //updated imports
+import { movies, movieCasts, reviews } from "../seed/movies"; //updated imports
 
 export class RestAPIStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -39,32 +39,15 @@ export class RestAPIStack extends cdk.Stack {
       });
 
     /**
- * Movie Review Table
- */
-const reviewsTable = new dynamodb.Table(this, "MovieReviewsTable", {
-  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-  partitionKey: { name: "movieId", type: dynamodb.AttributeType.STRING },
-  removalPolicy: cdk.RemovalPolicy.DESTROY,
-  tableName: "MovieReviews",
-  stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES, // Optional: If you need to enable DynamoDB Streams
-  sortKey: { name: "movieId", type: dynamodb.AttributeType.STRING }, // Optional: If you want to query by movieId
-});
-
-// Add attribute definitions separately
-reviewsTable.attributeDefinitions.push({ attributeName: "movieId", attributeType: dynamodb.AttributeType.STRING });
-reviewsTable.attributeDefinitions.push({ attributeName: "reviewerName", attributeType: dynamodb.AttributeType.STRING });
-reviewsTable.attributeDefinitions.push({ attributeName: "rating", attributeType: dynamodb.AttributeType.NUMBER });
-reviewsTable.attributeDefinitions.push({ attributeName: "text", attributeType: dynamodb.AttributeType.STRING });
-
-reviewsTable.addGlobalSecondaryIndex({
-  indexName: "ReviewerNameIndex",
-  partitionKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
-});
-
-reviewsTable.addGlobalSecondaryIndex({
-  indexName: "RatingIndex",
-  partitionKey: { name: "rating", type: dynamodb.AttributeType.NUMBER },
-});
+      * Movie Review Table
+    */
+      const reviewsTable = new dynamodb.Table(this, "ReviewsTable", {
+        billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+        partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
+        sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        tableName: "Reviews",
+      });
 
     // ---------- LAMBDA FUNCTIONS ----------
     /**
@@ -212,14 +195,12 @@ reviewsTable.addGlobalSecondaryIndex({
         reviewsTable.grantReadWriteData(addReviewFn);
         reviewsTable.grantReadData(getReviewsFn);
         reviewsTable.grantReadWriteData(updateReviewFn);
-
         // ---------- REST API ----------
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
       deployOptions: {
         stageName: "dev",
       },
-      // 👇 enable CORS
       defaultCorsPreflightOptions: {
         allowHeaders: ["Content-Type", "X-Amz-Date"],
         allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -269,5 +250,7 @@ reviewsTable.addGlobalSecondaryIndex({
       );
         
       }
+
     }
+
     
