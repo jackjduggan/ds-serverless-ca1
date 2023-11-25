@@ -12,8 +12,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event)}`);
 
     // params
-    const movieId = event?.pathParameters?.movieId ? parseInt(event?.pathParameters.movieId) : undefined;
-    const minRating = event?.queryStringParameters?.minRating;
+    const movieId   = event?.pathParameters?.movieId ? parseInt(event?.pathParameters.movieId) : undefined;
+    const minRating = event?.queryStringParameters?.minRating;  // min rating functionality
+    const reviewerName = event?.pathParameters?.reviewerName
+    ? decodeURIComponent(event?.pathParameters?.reviewerName) // fixes the issue of two worded reviewers not working properly
+    : undefined;
 
     // If missing movie id
     if (!movieId) {
@@ -36,6 +39,21 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
             ExpressionAttributeValues: {
               ...queryInput.ExpressionAttributeValues,
               ":rating": parseFloat(minRating),
+            },
+          }
+        : {
+        }),
+    };
+
+    // If url provides reviewer query, add FilterExpression
+    queryInput = {
+      ...queryInput,
+      ...(reviewerName
+        ? {
+            FilterExpression: "reviewerName = :name",
+            ExpressionAttributeValues: {
+              ...queryInput.ExpressionAttributeValues,
+              ":name": reviewerName,
             },
           }
         : {

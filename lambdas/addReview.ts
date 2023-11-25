@@ -61,6 +61,15 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   }
 };
 
+// Function to create an API Gateway response
+function createResponse(statusCode: number, body: any) {
+  return {
+    statusCode,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  };
+}
+
 function createDDbDocClient() {
   const ddbClient = new DynamoDBClient({ region: process.env.REGION });
   const marshallOptions = {

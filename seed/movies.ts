@@ -93,7 +93,7 @@ export const reviews : Review[] = [
   },
   {
     movieId: 1234,
-    reviewerName: "Jack Duggan",
+    reviewerName: "James Jameson",
     reviewDate: "15/11/2023",
     reviewContent: "Incredible!!!",
     reviewRating: 9
@@ -111,5 +111,12 @@ export const reviews : Review[] = [
     reviewDate: "25/11/2023",
     reviewContent: "Almost as good as the toy show!",
     reviewRating: 8
+  },
+  {
+    movieId: 1234,
+    reviewerName: "bob",
+    reviewDate: "01/01/1999",
+    reviewContent: "testing",
+    reviewRating: 1
   }
 ];
