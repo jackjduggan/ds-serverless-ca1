@@ -16,6 +16,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const minRating = event?.queryStringParameters?.minRating;  // min rating functionality
     const reviewerName = event?.pathParameters?.reviewerName
     ? decodeURIComponent(event?.pathParameters?.reviewerName) // fixes the issue of two worded reviewers not working properly
+                                                              // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
     : undefined;
 
     // If missing movie id
