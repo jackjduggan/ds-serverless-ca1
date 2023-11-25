@@ -175,13 +175,14 @@ export class RestAPIStack extends cdk.Stack {
             parameters: {
               RequestItems: {
                 [moviesTable.tableName]: generateBatch(movies),
-                [movieCastsTable.tableName]: generateBatch(movieCasts),  // Added
+                [movieCastsTable.tableName]: generateBatch(movieCasts),
+                [reviewsTable.tableName]: generateBatch(reviews)  // Forgot this line!!!
               },
             },
             physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), //.of(Date.now().toString()),
           },
           policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-            resources: [moviesTable.tableArn, movieCastsTable.tableArn],  // Includes movie cast
+            resources: [moviesTable.tableArn, movieCastsTable.tableArn, reviewsTable.tableArn],  // Includes movie cast && reviews
           }),
         });
         
@@ -241,11 +242,12 @@ export class RestAPIStack extends cdk.Stack {
     /**
      * Reviews API Endpoints
      */
-    const reviewsEndpoint = movieEndpoint.addResource("reviews");
+    const reviewEndpoint = movieEndpoint.addResource("reviews")
+    const reviewsEndpoint = moviesEndpoint.addResource("reviews");
     reviewsEndpoint.addMethod(
       "POST", new apig.LambdaIntegration(addReviewFn, { proxy: true })
       );
-    reviewsEndpoint.addMethod(
+    reviewEndpoint.addMethod(
       "GET", new apig.LambdaIntegration(getReviewsFn, { proxy: true })
       );
         

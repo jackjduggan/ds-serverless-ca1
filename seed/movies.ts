@@ -89,20 +89,27 @@ export const reviews : Review[] = [
     reviewerName: "Jack Duggan",
     reviewDate: "18/11/2023",
     reviewContent: "Loved this film, excellent watch.",
-    reviewRating: 3
+    reviewRating: 8
   },
   {
     movieId: 1234,
     reviewerName: "Jack Duggan",
     reviewDate: "15/11/2023",
     reviewContent: "Incredible!!!",
-    reviewRating: 5
+    reviewRating: 9
   },
   {
     movieId: 1234,
     reviewerName: "Angry Man",
     reviewDate: "13/11/2023",
     reviewContent: "Not very good to be honest.",
-    reviewRating: 4
+    reviewRating: 3
+  },
+  {
+    movieId: 1234,
+    reviewerName: "Patrick Kielty",
+    reviewDate: "25/11/2023",
+    reviewContent: "Almost as good as the toy show!",
+    reviewRating: 8
   }
 ];
