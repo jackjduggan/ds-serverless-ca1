@@ -1,52 +1,77 @@
-import { APIGatewayProxyHandlerV2 } from "aws-lambda";  // CHANGED
+import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 
+// Create DynamoDB Client
 const ddbDocClient = createDDbDocClient();
 
-export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { // CHANGED
+// Handler function handles API Gateway reqs
+export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
     // Print Event
-    console.log("Event: ", event);
+    console.log(`Event: ${JSON.stringify(event)}`);
 
-    const commandOutput = await ddbDocClient.send(
-      new ScanCommand({
-        TableName: process.env.TABLE_NAME,
-      })
-    );
+    // params
+    const movieId = event?.pathParameters?.movieId ? parseInt(event?.pathParameters.movieId) : undefined;
+    const minRating = event?.queryStringParameters?.minRating;
+
+    // If missing movie id
+    if (!movieId) {
+      return createResponse(404, { Message: "Missing movieId" });
+    }
+
+    // QueryCommandInput init
+    let queryInput: QueryCommandInput = {
+      TableName: process.env.TABLE_NAME!,
+      KeyConditionExpression: "movieId = :id",
+      ExpressionAttributeValues: { ":id": movieId },
+    };
+
+    // If url provides minRating query, add FilterExpression
+    queryInput = {
+      ...queryInput,
+      ...(minRating !== undefined && !isNaN(parseFloat(minRating))
+        ? {
+            FilterExpression: "reviewRating >= :rating",
+            ExpressionAttributeValues: {
+              ...queryInput.ExpressionAttributeValues,
+              ":rating": parseFloat(minRating),
+            },
+          }
+        : {
+        }),
+    };
+
+    // Execute query
+    const commandOutput = await ddbDocClient.send(new QueryCommand(queryInput));
+
+    // Check if no reviews found
     if (!commandOutput.Items) {
-      return {
-        statusCode: 404,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ Message: "Invalid." }),
-      };
+      return createResponse(404, { Message: "No reviews found" });
     }
     const body = {
       data: commandOutput.Items,
     };
 
-    // Return Response
-    return {
-      statusCode: 200,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(body),
-    };
+    // Successful response!
+    return createResponse(200, body);
   } catch (error: any) {
+    // Error if exception
     console.log(JSON.stringify(error));
-    return {
-      statusCode: 500,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ error }),
-    };
+    return createResponse(500, { error });
   }
 };
 
+// Function to create an API Gateway response
+function createResponse(statusCode: number, body: any) {
+  return {
+    statusCode,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  };
+}
+
+// Function to create DynamoDB Doc client
 function createDDbDocClient() {
   const ddbClient = new DynamoDBClient({ region: process.env.REGION });
   const marshallOptions = {
