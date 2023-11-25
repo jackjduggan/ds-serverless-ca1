@@ -1,7 +1,9 @@
 Current functionality and proof it's working.
 
 Add a Movie Review:
+
 ![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/617f740d-ad76-4e86-b11a-48e5b19341e2)
+
 You can then see the new movie when getting the reviews
 ![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/b275b826-e120-47bb-ace1-dffcd5646e4b)
 
