@@ -15,6 +15,10 @@ I spent substantial time trying to get both
 GET /movies/{movieId}/reviews/{year} & PUT /movies/{movieId}/reviews
 working, but to no avail. The code is still project relevant, so I left it in, in case there are any marks available.
 
+Added reviewRating attribute to schema for use with minRating.
+
+AJV validation.
+
 [Include screenshots from the AWS console (API Gateway service) that clearly show the deployed API ( have legible font size). ]
 
 ![Alt text](image.png)
