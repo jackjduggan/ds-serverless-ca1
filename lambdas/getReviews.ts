@@ -18,6 +18,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     ? decodeURIComponent(event?.pathParameters?.reviewerName) // fixes the issue of two worded reviewers not working properly
                                                               // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
     : undefined;
+    //const year = event?.pathParameters?.year || ""; // "" fixes typescript complaining about year possibly being undefined
+    //const isValidYear = new RegExp("^[0-9]{4}$"); // uses regex to check if 4-digit year format.
 
     // If missing movie id
     if (!movieId) {
@@ -60,6 +62,30 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         : {
         }),
     };
+
+    // If url provides reviewerName or year query, add FilterExpression
+    // if (reviewerName) {
+    //   queryInput = {
+    //     ...queryInput,
+    //     FilterExpression: "reviewerName = :name",
+    //     ExpressionAttributeValues: {
+    //       ...queryInput.ExpressionAttributeValues,
+    //       ":name": { S: reviewerName },
+    //     },
+    //   };
+    // } else if (year && isValidYear.test(year)) {
+    //   queryInput = {
+    //     ...queryInput,
+    //     FilterExpression: "begins_with(reviewDate, :year)",
+    //     ExpressionAttributeValues: {
+    //       ...queryInput.ExpressionAttributeValues,
+    //       ":year": { S: year },
+    //     },
+    //   };
+    // } else {
+    //   // If neither reviewerName nor year is provided, handle it as needed
+    //   return createResponse(400, { Message: "Invalid request. Please provide reviewerName or year." });
+    // }
 
     // Execute query
     const commandOutput = await ddbDocClient.send(new QueryCommand(queryInput));

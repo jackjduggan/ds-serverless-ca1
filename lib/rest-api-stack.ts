@@ -196,6 +196,7 @@ export class RestAPIStack extends cdk.Stack {
         reviewsTable.grantReadWriteData(addReviewFn);
         reviewsTable.grantReadData(getReviewsFn);
         reviewsTable.grantReadWriteData(updateReviewFn);
+
         // ---------- REST API ----------
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -245,15 +246,36 @@ export class RestAPIStack extends cdk.Stack {
     const reviewEndpoint = movieEndpoint.addResource("reviews")
     const reviewsEndpoint = moviesEndpoint.addResource("reviews");
     const reviewerEndpoint = reviewEndpoint.addResource("{reviewerName}")
+    //const reviewerEndpoint = reviewEndpoint.addResource("{proxy}")
+    //const yearEndpoint = reviewEndpoint.addResource("{year}")
+
+    // POST reviews endpoint
     reviewsEndpoint.addMethod(
       "POST", new apig.LambdaIntegration(addReviewFn, { proxy: true })
       );
+
+    // Get reviews endpoints 
     reviewEndpoint.addMethod(
       "GET", new apig.LambdaIntegration(getReviewsFn, { proxy: true })
       );
+
+    /**
+     * Reviewer Endpoints
+     */
+    // Get review by reviewer endpoint
     reviewerEndpoint.addMethod(
       "GET", new apig.LambdaIntegration(getReviewsFn, { proxy: true })
-    )
+      );
+    // Update endpoint
+    reviewerEndpoint.addMethod(
+      "PUT", new apig.LambdaIntegration(updateReviewFn, { proxy: true })
+      );
+
+    // Get reviews for a specific year endpoint
+    // yearEndpoint.addMethod(
+    //   "GET",
+    //   new apig.LambdaIntegration(getReviewsFn, { proxy: true })
+    //   );
         
       }
 
