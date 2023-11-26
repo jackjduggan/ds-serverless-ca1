@@ -11,7 +11,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { // 
     console.log("Event: ", event);
     const reviewerName = event?.pathParameters?.reviewerNameReviews
     ? decodeURIComponent(event?.pathParameters?.reviewerNameReviews) // fixes the issue of two worded reviewers not working properly
-                                                              // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
+                                                                     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
     : undefined;
     
     const commandOutput = await ddbDocClient.send(

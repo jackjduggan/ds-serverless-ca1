@@ -21,21 +21,15 @@ working, but to no avail. The code is still project relevant, so I left it in, i
 
 ### Authentication..
 
-Didn't get authentication working.
+Didn't get authentication working. Ran out of time.
 
 ### Independent learning (If relevant).
 
 I followed tutorial at https://completecoding.io/typescript-translation-api/ in an attempt to get translate functionality working.
 Ultimately, I couldn't get it to work after spending hours trying.
 
-Get the review for the movie with the specified movie ID and written by the named reviewer.
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/ad45965c-038b-4ba7-bccf-40d1d848f114)
-
-Get all the reviews written by a specific reviewer.
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/507d6162-bd4d-4d99-9920-ffd1746da5a8)
-
-
-
-
-State any other evidence of independent learning achieved while completing this assignment.
+I figured out how to get name + surname working for reviewerName in the URL.
+I found an article at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent that explained how to use "decodeURIComponent".
+const reviewerName = event?.pathParameters?.reviewerNameMovie? decodeURIComponent(event?.pathParameters?.reviewerNameMovie) : undefined;
+Before implementing this, reviewerName only worked when the provided string had no spaces i.e. "bob", but now it works for spaces i.e. "Jack Duggan".
 

@@ -8,19 +8,13 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
     console.log("Event: ", event);
     
-const movieId = parseInt(event?.pathParameters?.movieId ?? "");
-const reviewerName = event?.pathParameters?.reviewerName;
-const content = event?.body;
+    const movieId = parseInt(event?.pathParameters?.movieId ?? "");
+    const reviewerName = event?.pathParameters?.reviewerNameMovie;
+    const content = event?.body;
 
-if (!movieId || !reviewerName) {
-  return {
-    statusCode: 404,
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ Message: "Invalid movie Id or reviewer name entered" }),
-  };
-}
+    if (!movieId || !reviewerName) {
+      return createResponse(200, { message: "Invalid movie id or reviewer name entered"} );
+    }
 
     const commandInput = {
       TableName: process.env.TABLE_NAME,
@@ -45,27 +39,21 @@ if (!movieId || !reviewerName) {
         })
       );
       
-
-    return {
-      statusCode: 200,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        message: "Update has been made to review content",
-      }),
-    };
+    return createResponse(200, { message: "Update has been made to review content"} );
   } catch (error: any) {
     console.log(JSON.stringify(error));
-    return {
-      statusCode: 500,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ error }),
-    };
+    return createResponse(500, { error });
   }
 };
+
+// Function to create an API Gateway response
+function createResponse(statusCode: number, body: any) {
+  return {
+    statusCode,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  };
+}
 
 function createDDbDocClient() {
   const ddbClient = new DynamoDBClient({ region: process.env.REGION });

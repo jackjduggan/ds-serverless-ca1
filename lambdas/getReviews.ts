@@ -16,7 +16,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const minRating = event?.queryStringParameters?.minRating;  // min rating functionality
     const reviewerName = event?.pathParameters?.reviewerNameMovie
     ? decodeURIComponent(event?.pathParameters?.reviewerNameMovie) // fixes the issue of two worded reviewers not working properly
-                                                              // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
+                                                                   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
     : undefined;
     //const year = event?.pathParameters?.year || ""; // "" fixes typescript complaining about year possibly being undefined
     //const isValidYear = new RegExp("^[0-9]{4}$"); // uses regex to check if 4-digit year format.
@@ -62,6 +62,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         : {
         }),
     };
+
+    /** 
+     * Not working year/name filter
+     */
 
     // If url provides reviewerName or year query, add FilterExpression
     // if (reviewerName) {
