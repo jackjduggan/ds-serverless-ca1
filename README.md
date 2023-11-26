@@ -16,6 +16,10 @@ Get all the reviews for the movie with the specified ID with a rating greater th
 Get the review for the movie with the specified movie ID and written by the named reviewer.
 ![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/ad45965c-038b-4ba7-bccf-40d1d848f114)
 
+Get all the reviews written by a specific reviewer.
+![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/507d6162-bd4d-4d99-9920-ffd1746da5a8)
+
+
 
 
 
