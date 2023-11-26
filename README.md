@@ -1,17 +1,33 @@
-Current functionality and proof it's working.
+## ServerlessREST Sddignment - Distributed Systems.
 
-Add a Movie Review:
+__Name:__ .... Jack Duggan .....
 
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/617f740d-ad76-4e86-b11a-48e5b19341e2)
+This repository contains the implementation of a serverless REST API for the AWS platform. A CDK stack creates the infrastructure. The domain context of the API is movie reviews.
 
-You can then see the new movie when getting the reviews
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/b275b826-e120-47bb-ace1-dffcd5646e4b)
+### API endpoints.
++ POST /movies/reviews - add a movie review.
++ GET /movies/{movieId}/reviews - Get all the reviews for a movie with the specified id.
++ GET /movies/{movieId}/reviews?minRating=n - Get all the reviews for the movie with the specified ID with a rating greater than the minRating.
++ GET /movies/{movieId}/reviews/{reviewerName} - Get the review for the movie with the specified movie ID and written by the named reviewer.
++ GET /movies/reviews/{reviewerName} - Get all the reviews written by a specific reviewer
 
-Get all reviews for a specific Movie ID:
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/e8fc9449-84cf-4128-a69b-839e99a261f2)
+I spent substantial time trying to get both
+GET /movies/{movieId}/reviews/{year} & PUT /movies/{movieId}/reviews
+working, but to no avail. The code is still project relevant, so I left it in, in case there are any marks available.
 
-Get all the reviews for the movie with the specified ID with a rating greater than the minRating.
-![image](https://github.com/jackjduggan/ds-serverless-ca1/assets/74904632/005509bd-2bca-4178-a8e7-956b2cb1d811)
+[Include screenshots from the AWS console (API Gateway service) that clearly show the deployed API ( have legible font size). ]
+
+![Alt text](image.png)
+
+### Authentication..
+
+Didn't get authentication working.
+
+### Independent learning (If relevant).
+
+I followed tutorial at https://completecoding.io/typescript-translation-api/ in an attempt to get translate functionality working.
+Ultimately, I couldn't get it to work after spending hours trying.
 
 
+State any other evidence of independent learning achieved while completing this assignment.
 

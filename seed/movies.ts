@@ -1,4 +1,4 @@
-import {Movie, MovieCast, Review } from '../shared/types' //updated imports
+import {Movie, Review } from '../shared/types' //updated imports
 
 export const movies : Movie[] = [
   {
@@ -55,34 +55,6 @@ export const movies : Movie[] = [
   },
 ];
 
-// new movieCast data
-export const movieCasts: MovieCast[] = [
-  {
-    movieId: 1234,
-    actorName: "Joe Bloggs",
-    roleName: "Male Character 1",
-    roleDescription: "description of character 1",
-  },
-  {
-    movieId: 1234,
-    actorName: "Alice Broggs",
-    roleName: "Female Character 1",
-    roleDescription: "description of character 2",
-  },
-  {
-    movieId: 1234,
-    actorName: "Joe Cloggs",
-    roleName: "Male Character 2",
-    roleDescription: "description of character 3",
-  },
-  {
-    movieId: 2345,
-    actorName: "Joe Bloggs",
-    roleName: "Male Character 1",
-    roleDescription: "description of character 3",
-  },
-];
-
 export const reviews : Review[] = [
   {
     movieId: 1234,
@@ -116,7 +88,7 @@ export const reviews : Review[] = [
     movieId: 1234,
     reviewerName: "bob",
     reviewDate: "01/01/1999",
-    reviewContent: "testing",
+    reviewContent: "I am testing the review functionality with this comment!",
     reviewRating: 1
   }
 ];

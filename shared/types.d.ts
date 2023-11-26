@@ -10,21 +10,7 @@ export type Movie = {
     video: boolean;
     vote_average: number;
     vote_count: number
-  }
-
-// new type declarations
-export type MovieCast = {
-    movieId: number;
-    actorName: string;
-    roleName: string;
-    roleDescription: string;
-  };
-  // Used to validate the query string og HTTP Get requests
-export type MovieCastMemberQueryParams = {
-    movieId: string;
-    actorName?: string;
-    roleName?: string
-  }
+}
 
 export type Review = {
     movieId: number;
