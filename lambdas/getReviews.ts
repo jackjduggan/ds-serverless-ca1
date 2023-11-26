@@ -2,6 +2,7 @@ import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 
+
 // Create DynamoDB Client
 const ddbDocClient = createDDbDocClient();
 
@@ -14,8 +15,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // params
     const movieId   = event?.pathParameters?.movieId ? parseInt(event?.pathParameters.movieId) : undefined;
     const minRating = event?.queryStringParameters?.minRating;  // min rating functionality
-    const reviewerName = event?.pathParameters?.reviewerName
-    ? decodeURIComponent(event?.pathParameters?.reviewerName) // fixes the issue of two worded reviewers not working properly
+    const reviewerName = event?.pathParameters?.reviewerNameMovie
+    ? decodeURIComponent(event?.pathParameters?.reviewerNameMovie) // fixes the issue of two worded reviewers not working properly
                                                               // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
     : undefined;
     //const year = event?.pathParameters?.year || ""; // "" fixes typescript complaining about year possibly being undefined
